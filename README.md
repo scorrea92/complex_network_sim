@@ -4,8 +4,8 @@ Final project for MUIARFID UPV class HAIA
 ## Option #1 REPAST
 **Built With**
 
-* [Java](https://github.com/tensorflow/tensorflow) - Bakend for Deeplearning
-* [Repast](https://github.com/keras-team/keras) - 
+* [Java](https://www.oracle.com/java/index.html) - Java is a general-purpose computer-programming language that is concurrent, class-based, object-oriented.
+* [Repast](https://repast.github.io) - The Repast Suite is a family of advanced, free, and open source agent-based modeling and simulation platforms.
 
 ## Option #2 ComplexNetworkSims
 **Built With**
