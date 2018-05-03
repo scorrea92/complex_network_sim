@@ -1,4 +1,4 @@
-# complex_network_sim
+# Complex Network Simulation
 Final project for MUIARFID UPV class HAIA
 
 ## Option #1 REPAST
