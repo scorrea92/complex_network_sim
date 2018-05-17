@@ -1,77 +1,53 @@
-'''
-Complete code file only from ComplexNetworkSim's "getting started" documentation section, for defining agent behaviour and running a simulation. For explanations refer to the documentation page.
-Current link: http://complexnetworksim.0sites.net/start.html (documentation hosting may change place - see the PyPi index page.)
-
-@author: Joe Schaul <firstname.lastname@gmail.com>
-'''
-
-#define three constants for our example:
-SUSCEPTIBLE = 0
-INFECTED = 1
-RECOVERED = 2
-
-
-from ComplexNetworkSim import NetworkAgent, Sim
-
-class SIRSimple(NetworkAgent):
-    """ an implementation of an agent following the simple SIR model """
-
-    def __init__(self, state, initialiser):
-        NetworkAgent.__init__(self, state, initialiser)
-        self.infection_probability = 0.05 # 5% chance
-        self.infection_end = 5
-
-    def Run(self):
-        while True:
-            if self.state == SUSCEPTIBLE:
-                self.maybeBecomeInfected()
-                yield Sim.hold, self, NetworkAgent.TIMESTEP_DEFAULT #wait a step
-            elif self.state == INFECTED:
-                yield Sim.hold, self, self.infection_end  #wait end of infection
-                self.state = RECOVERED
-                yield Sim.passivate, self #remove agent from event queue
-
-    def maybeBecomeInfected(self):
-        infected_neighbours = self.getNeighbouringAgentsIter(state=INFECTED)
-        for neighbour in infected_neighbours:
-            if SIRSimple.r.random() < self.infection_probability:
-                self.state = INFECTED
-                break
-
-
 import networkx as nx
 
-nodes = 30 #we want a graph with 30 agents as a test.
+number_of_nodes = 100
+G = nx.complete_graph(number_of_nodes)
 
-# Network and initial states of agents
-G = nx.scale_free_graph(nodes)
-states = [SUSCEPTIBLE for n in G.nodes()]  #list of states corresponding to agent states
+import random
+from nxsim import BaseNetworkAgent
 
-states[0] = INFECTED
+class ZombieOutbreak(BaseNetworkAgent):
+    def __init__(self, environment=None, agent_id=0, state=()):
+        super().__init__(environment=environment, agent_id=agent_id, state=state)
+        self.bite_prob = 0.05
 
-from ComplexNetworkSim import NetworkSimulation
+    def run(self):
+        while True:
+            if self.state['id'] == 1:
+                self.zombify()
+                yield self.env.timeout(1)
+            else:
+                yield self.env.event()
 
-# Simulation constants
-MAX_SIMULATION_TIME = 25.0
-TRIALS = 2
+    def zombify(self):
+        normal_neighbors = self.get_neighboring_agents(state_id=0)
+        for neighbor in normal_neighbors:
+            if random.random() < self.bite_prob:
+                neighbor.state['id'] = 1 # zombie
+                print(self.env.now, self.id, neighbor.id, sep='\t')
+                break
 
-def main():
-    directory = 'results' #output directory
+from nxsim import NetworkSimulation
 
-    # run simulation with parameters
-    # - complex network structure
-    # - initial state list
-    # - agent behaviour class
-    # - output directory
-    # - maximum simulation time
-    # - number of trials
-    simulation = NetworkSimulation(G,
-                                   states,
-                                   SIRSimple,
-                                   directory,
-                                   MAX_SIMULATION_TIME,
-                                   TRIALS)
-    simulation.runSimulation()
+# Initialize agent states. Let's assume everyone is normal.
+init_states = [{'id': 0, } for _ in range(number_of_nodes)]  # add keys as as necessary, but "id" must always refer to that state category
 
-if __name__ == '__main__':
-    main()
+# Seed a zombie
+init_states[5] = {'id': 1}
+sim = NetworkSimulation(topology=G, states=init_states, agent_type=ZombieOutbreak, 
+                        max_time=30, num_trials=1, logging_interval=1.0)
+
+
+sim.run_simulation()
+
+#%matplotlib inline
+nx.draw(G)
+
+# from nxsim import BaseLoggingAgent
+# trial = BaseLoggingAgent.open_trial_state_history(dir_path='sim_01', trial_id=0)
+
+# import numpy as np
+# from matplotlib import pyplot as plt
+# #%matplotlib inline
+# zombie_census = [sum([1 for node_id, state in g.items() if state['id'] == 1]) for t,g in trial.items()]
+# plt.plot(zombie_census)

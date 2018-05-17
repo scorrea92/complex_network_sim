@@ -10,8 +10,8 @@ Final project for MUIARFID UPV class HAIA
 ## Option #2 ComplexNetworkSims
 **Built With**
 
-* [Python 2.7](https://www.python.org) - Python is a programming language that lets you work more quickly and integrate your systems more effectively.
-* [ComplexNetworkSim](https://pythonhosted.org/ComplexNetworkSim/) - ComplexNetworkSim is a Python package for the simulation of agents connected in a complex network.
+* [Python 3.6](https://www.python.org) - Python is a programming language that lets you work more quickly and integrate your systems more effectively.
+* [ComplexNetworkSim](https://github.com/kentwait/nxsim) - Nxsim is a Python package for simulating agents connected by any type of network using SimPy and Networkx in Python.
 
 ## Authors
 
